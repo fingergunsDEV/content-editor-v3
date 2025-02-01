@@ -1,0 +1,181 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Advanced Content Analysis Suite</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/compromise@latest/builds/compromise.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.5/purify.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.5/purify.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/default.min.css">
+</head>
+<body class="theme-light">
+  <aside class="side-menu">
+    <div class="theme-selector">
+      <button class="theme-btn active" data-theme="light">Light</button>
+      <button class="theme-btn" data-theme="dark">Dark</button>
+      <button class="theme-btn" data-theme="gradient">Gradient</button>
+      <button class="theme-btn" data-theme="glass">Glass</button>
+      <button class="theme-btn" data-theme="neomorphic">Neomorphic</button>
+    </div>
+
+    <nav class="nav-tabs">
+      <button class="nav-tab active" data-tab="editor">Editor</button>
+      <button class="nav-tab" data-tab="keywords">Keywords & Density</button>
+      <button class="nav-tab" data-tab="entities">Named Entities</button>
+      <button class="nav-tab" data-tab="sentiment">Sentiment</button>
+      <button class="nav-tab" data-tab="readability">Readability</button>
+      <button class="nav-tab" data-tab="linguistic">Linguistic</button>
+    </nav>
+
+    <div class="analysis-summary">
+      <h3>Analysis Summary</h3>
+      <div id="summaryResults">
+        <div class="metric-card">
+          <p>Run analysis to see results</p>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="editor-container">
+      <div class="toolbar">
+        <button id="boldBtn" title="Bold (Ctrl+B)">
+          <svg viewBox="0 0 24 24" width="24" height="24">
+            <path fill="currentColor" d="M15.6 11.8c.9-.7 1.4-1.7 1.4-2.8 0-2.6-2.2-4.7-5-4.7H7v13.5h5.8c2.8 0 5-2.1 5-4.7 0-.7-.2-1.4-.5-2-.4-.7-.9-1.2-1.7-1.6zM9 6.3h3c1.3 0 2.3.9 2.3 2s-1 2-2.3 2H9V6.3zm3.3 9.5H9v-4h3.3c1.3 0 2.3.9 2.3 2s-1 2-2.3 2z"/>
+          </svg>
+        </button>
+        <button id="italicBtn" title="Italic (Ctrl+I)">
+          <svg viewBox="0 0 24 24" width="24" height="24">
+            <path fill="currentColor" d="M10 4v3h2.2l-3.4 10H6v3h8v-3h-2.2l3.4-10H18V4z"/>
+          </svg>
+        </button>
+        <button id="underlineBtn" title="Underline (Ctrl+U)">
+          <svg viewBox="0 0 24 24" width="24" height="24">
+            <path fill="currentColor" d="M12 17c3.31 0 6-2.69 6-6V3h-2.5v8c0 1.93-1.57 3.5-3.5 3.5S8.5 12.93 8.5 11V3H6v8c0 3.31 2.69 6 6 6zm-7 2v2h14v-2H5z"/>
+          </svg>
+        </button>
+        <div class="separator"></div>
+        <button id="undoBtn" title="Undo (Ctrl+Z)">
+          <svg viewBox="0 0 24 24" width="24" height="24">
+            <path fill="currentColor" d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z"/>
+          </svg>
+        </button>
+        <button id="redoBtn" title="Redo (Ctrl+Y)">
+          <svg viewBox="0 0 24 24" width="24" height="24">
+            <path fill="currentColor" d="M18.4 10.6C16.55 8.99 14.15 8 11.5 8c-4.65 0-8.58 3.03-9.96 7.22L3.9 16a8.002 8.002 0 0 1 7.6-5.5c1.95 0 3.73.72 5.12 1.88L13 16h9V7l-3.6 3.6z"/>
+          </svg>
+        </button>
+      </div>
+
+      <div id="editor" class="editor" contenteditable="true" spellcheck="true"></div>
+      
+      <div class="analysis-content">
+        <div class="keyword-input">
+          <input type="text" id="keywordsInput" placeholder="Enter focus keywords (comma-separated)">
+          <button id="analyzeBtn">Analyze Content</button>
+        </div>
+
+        <!-- Tab Panels -->
+        <div class="tab-panels">
+          <div class="tab-panel active" id="editor-panel">
+            <!-- Editor is shown by default -->
+          </div>
+
+          <div class="tab-panel" id="keywords-panel">
+            <div class="metric-card">
+              <h3>Keyword Density</h3>
+              <div id="densityResults"></div>
+            </div>
+            <div class="metric-card">
+              <h3>Important Terms (TF-IDF)</h3>
+              <div id="tfidfResults"></div>
+            </div>
+          </div>
+
+          <div class="tab-panel" id="entities-panel">
+            <div class="metric-card">
+              <h3>Named Entities</h3>
+              <div id="entityResults">
+                <div class="entities-grid">
+                  <div id="peopleEntities">
+                    <h4>People</h4>
+                    <div class="entity-tags"></div>
+                  </div>
+                  <div id="organizationEntities">
+                    <h4>Organizations</h4>
+                    <div class="entity-tags"></div>
+                  </div>
+                  <div id="locationEntities">
+                    <h4>Locations</h4>
+                    <div class="entity-tags"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-panel" id="sentiment-panel">
+            <div class="metric-card">
+              <h3>Sentiment Analysis</h3>
+              <canvas id="sentimentChart"></canvas>
+              <div id="sentimentResults"></div>
+            </div>
+            <div class="metric-card">
+              <h3>Emotional Tone Distribution</h3>
+              <div id="emotionalToneResults"></div>
+            </div>
+          </div>
+
+          <div class="tab-panel" id="readability-panel">
+            <div class="metric-card">
+              <h3>Readability Metrics</h3>
+              <div id="readabilityResults"></div>
+            </div>
+            <div class="metric-card">
+              <h3>Content Quality</h3>
+              <div id="qualityResults"></div>
+            </div>
+          </div>
+
+          <div class="tab-panel" id="linguistic-panel">
+            <div class="metric-card">
+              <h3>Linguistic Analysis</h3>
+              <div id="linguisticResults">
+                <div class="grammar-section">
+                  <h4>Grammar Structure</h4>
+                  <div id="grammarResults"></div>
+                </div>
+                <div class="parts-of-speech">
+                  <h4>Parts of Speech Distribution</h4>
+                  <canvas id="posChart"></canvas>
+                  <div id="posResults"></div>
+                </div>
+                <div class="vocabulary-metrics">
+                  <h4>Vocabulary Metrics</h4>
+                  <div id="vocabularyResults"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="status-bar">
+        <span id="wordCount">Words: 0</span>
+        <span id="charCount">Characters: 0</span>
+        <span id="readingTime">Reading time: 0 min</span>
+      </div>
+    </div>
+  </main>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>
